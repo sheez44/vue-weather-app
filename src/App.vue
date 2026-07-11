@@ -76,6 +76,8 @@ const displayedLocations = computed(() => {
 
   if (options.value.ascending) {
     locations.sort((a, b) => a.current.temp_c - b.current.temp_c)
+  } else {
+    locations.sort((a, b) => b.current.temp_c - a.current.temp_c)
   }
 
   return locations
@@ -96,7 +98,10 @@ fetchData(true)
   </div>
   <div class="sorter">
     <p>Sort by</p>
-    <button @click="() => (options.ascending = !options.ascending)">Temperature</button>
+    <button @click="() => (options.ascending = !options.ascending)">
+      <span v-if="options.ascending"> 🌡️ Temp ↓ </span>
+      <span v-else> 🌡️ Temp ↑ </span>
+    </button>
   </div>
   <div class="weather-cards" v-if="locationData.length > 0">
     <Card
