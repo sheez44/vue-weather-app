@@ -2,11 +2,12 @@
 const API_KEY = '877e1c5722a14576bd2112544261007'
 
 import Card from '@/components/Card.vue'
+import Message from '@/components/Message.vue'
 import { ref } from 'vue'
 
 const locationData = ref([])
 const searchLocation = ref('')
-
+const errorMsg = ref('')
 const isFetching = ref(false)
 
 if (localStorage.getItem('weatherData')) {
@@ -14,13 +15,20 @@ if (localStorage.getItem('weatherData')) {
   console.log(JSON.parse(localStorage.getItem('weatherData')))
 }
 
-async function fetchData() {
+async function fetchData(autocall) {
   isFetching.value = true
+
   const locationExists = locationData.value.find(
     (item) => item.location.name === searchLocation.value,
   )
 
   if (locationExists) {
+    isFetching.value = false
+    return
+  }
+
+  if (searchLocation.value.length <= 0) {
+    isFetching.value = false
     return
   }
 
@@ -30,8 +38,14 @@ async function fetchData() {
   const result = await response.json()
   isFetching.value = false
 
+  console.log('fetching')
+
   if (result.error) {
-    searchLocation.value = ''
+    // dont show
+    if (!autocall) {
+      errorMsg.value = result.error.message
+    }
+
     return
   }
 
@@ -53,6 +67,8 @@ function removeLocation(locationId) {
   locationData.value.splice(locationId, 1)
   setLocalStorage()
 }
+
+fetchData(true)
 </script>
 
 <template>
@@ -60,7 +76,10 @@ function removeLocation(locationId) {
   <button @click="fetchData">enter location</button>
   <button @click="clearAllData">Remove all cities</button>
   <div v-if="isFetching">
-    <p>fetching data</p>
+    <Message message="Is fetching data" />
+  </div>
+  <div v-if="errorMsg.length">
+    <Message :message="errorMsg" />
   </div>
   <div class="weather-cards" v-if="locationData.length > 0">
     <Card
