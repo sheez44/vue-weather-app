@@ -74,14 +74,30 @@ function removeLocation(locationId) {
 const displayedLocations = computed(() => {
   let locations = [...locationData.value]
 
-  if (options.value.ascending) {
+  if (options.value.direction === 'ascending') {
     locations.sort((a, b) => a.current.temp_c - b.current.temp_c)
-  } else {
+  }
+  if (options.value.direction === 'descending') {
     locations.sort((a, b) => b.current.temp_c - a.current.temp_c)
   }
 
   return locations
 })
+
+function toggleDirection() {
+  if (options.value.direction === 'ascending') {
+    options.value.direction = 'descending'
+  } else {
+    options.value.direction = 'ascending'
+  }
+}
+
+function resetOptions() {
+  console.log('resetting')
+  options.value = {
+    direction: null,
+  }
+}
 
 fetchData(true)
 </script>
@@ -98,10 +114,12 @@ fetchData(true)
   </div>
   <div class="sorter">
     <p>Sort by</p>
-    <button @click="() => (options.ascending = !options.ascending)">
-      <span v-if="options.ascending"> 🌡️ Temp ↓ </span>
-      <span v-else> 🌡️ Temp ↑ </span>
+    <button @click="toggleDirection">
+      <span v-if="options.direction === 'ascending'"> 🌡️ Temp ↑ </span>
+      <span v-else-if="options.direction === 'descending'"> 🌡️ Temp ↓ </span>
+      <span v-else> 🌡️ Temp </span>
     </button>
+    <button @click="resetOptions">Reset</button>
   </div>
   <div class="weather-cards" v-if="locationData.length > 0">
     <Card
