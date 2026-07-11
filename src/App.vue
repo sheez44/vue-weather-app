@@ -3,12 +3,15 @@ const API_KEY = '877e1c5722a14576bd2112544261007'
 
 import Card from '@/components/Card.vue'
 import Message from '@/components/Message.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const locationData = ref([])
 const searchLocation = ref('')
 const errorMsg = ref('')
 const isFetching = ref(false)
+const options = ref({
+  ascending: false,
+})
 
 if (localStorage.getItem('weatherData')) {
   locationData.value = JSON.parse(localStorage.getItem('weatherData'))
@@ -68,6 +71,16 @@ function removeLocation(locationId) {
   setLocalStorage()
 }
 
+const displayedLocations = computed(() => {
+  let locations = [...locationData.value]
+
+  if (options.value.ascending) {
+    locations.sort((a, b) => a.current.temp_c - b.current.temp_c)
+  }
+
+  return locations
+})
+
 fetchData(true)
 </script>
 
@@ -81,10 +94,14 @@ fetchData(true)
   <div v-if="errorMsg.length">
     <Message :message="errorMsg" />
   </div>
+  <div class="sorter">
+    <p>Sort by</p>
+    <button @click="() => (options.ascending = !options.ascending)">Temperature</button>
+  </div>
   <div class="weather-cards" v-if="locationData.length > 0">
     <Card
       class="weather-card"
-      v-for="(location, index) in locationData"
+      v-for="(location, index) in displayedLocations"
       :key="index"
       :index="index"
       :location="location"
