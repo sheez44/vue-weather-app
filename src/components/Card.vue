@@ -13,22 +13,22 @@ defineProps({
     <p>{{ location.current.condition.text }}</p>
     <p>Temperature: {{ location.current.temp_c }}</p>
     <p>Local time: {{ location.location.localtime }}</p>
-    <button @click="$emit('deleteCard', index)">X</button>
+    <button class="delete-button" @click="$emit('deleteCard', index)">X</button>
   </div>
 </template>
 
 <style scoped>
-.weather-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  margin: 1rem 0;
-}
 .weather-card {
   border: 1px solid black;
-  padding: 1rem;
+  padding: 1rem 2rem 1rem 1rem;
+  position: relative;
 }
 h1 {
   margin-top: 0;
+}
+.delete-button {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
 }
 </style>

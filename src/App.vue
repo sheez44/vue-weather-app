@@ -81,8 +81,4 @@ function removeLocation(locationId) {
   gap: 1rem;
   margin: 1rem 0;
 }
-.weather-card {
-  border: 1px solid black;
-  padding: 1rem;
-}
 </style>
