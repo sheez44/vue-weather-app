@@ -1,5 +1,8 @@
 <script setup>
-const { location } = defineProps(['location'])
+defineProps({
+  location: Object,
+  index: Number,
+})
 </script>
 
 <template>
@@ -10,7 +13,7 @@ const { location } = defineProps(['location'])
     <p>{{ location.current.condition.text }}</p>
     <p>Temperature: {{ location.current.temp_c }}</p>
     <p>Local time: {{ location.location.localtime }}</p>
-    <button @click="removeLocation(location.id)">X</button>
+    <button @click="$emit('deleteCard', index)">X</button>
   </div>
 </template>
 

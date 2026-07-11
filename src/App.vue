@@ -6,15 +6,12 @@ import { ref } from 'vue'
 
 const locationData = ref([])
 const searchLocation = ref('')
-const id = ref(0)
+
 const isFetching = ref(false)
 
 if (localStorage.getItem('weatherData')) {
   locationData.value = JSON.parse(localStorage.getItem('weatherData'))
   console.log(JSON.parse(localStorage.getItem('weatherData')))
-  if (locationData.value.length > 0) {
-    id.value = Math.max(...locationData.value.map((item) => item.id)) + 1
-  }
 }
 
 async function fetchData() {
@@ -38,8 +35,6 @@ async function fetchData() {
     return
   }
 
-  console.log(response, result)
-  result.id = id.value++
   locationData.value.push(result)
   setLocalStorage()
   searchLocation.value = ''
@@ -54,6 +49,10 @@ function clearAllData() {
   localStorage.removeItem('weatherData')
   isFetching.value = false
 }
+function removeLocation(locationId) {
+  locationData.value.splice(locationId, 1)
+  setLocalStorage()
+}
 </script>
 
 <template>
@@ -66,9 +65,11 @@ function clearAllData() {
   <div class="weather-cards" v-if="locationData.length > 0">
     <Card
       class="weather-card"
-      v-for="location in locationData"
-      :key="location.id"
+      v-for="(location, index) in locationData"
+      :key="index"
+      :index="index"
       :location="location"
+      v-on:deleteCard="removeLocation"
     />
   </div>
 </template>
