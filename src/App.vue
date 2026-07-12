@@ -10,7 +10,8 @@ const searchLocation = ref('')
 const errorMsg = ref('')
 const isFetching = ref(false)
 const options = ref({
-  ascending: false,
+  sortBy: null,
+  direction: 'ascending',
 })
 
 if (localStorage.getItem('weatherData')) {
@@ -74,28 +75,38 @@ function removeLocation(locationId) {
 const displayedLocations = computed(() => {
   let locations = [...locationData.value]
 
-  if (options.value.direction === 'ascending') {
-    locations.sort((a, b) => a.current.temp_c - b.current.temp_c)
+  if (options.value.sortBy === 'temperature') {
+    if (options.value.direction === 'ascending') {
+      locations.sort((a, b) => a.current.temp_c - b.current.temp_c)
+    }
+    if (options.value.direction === 'descending') {
+      locations.sort((a, b) => b.current.temp_c - a.current.temp_c)
+    }
   }
-  if (options.value.direction === 'descending') {
-    locations.sort((a, b) => b.current.temp_c - a.current.temp_c)
+
+  if (options.value.sortBy === 'alphabetical') {
+    if (options.value.direction === 'ascending') {
+      locations.sort((a, b) => {
+        return a.location.name.localeCompare(b.location.name)
+      })
+    }
+    if (options.value.direction === 'descending') {
+      locations.sort((a, b) => {
+        return b.location.name.localeCompare(a.location.name)
+      })
+    }
   }
 
   return locations
 })
 
-function toggleDirection() {
+function toggleSort(sortBy) {
+  options.value.sortBy = sortBy
+
   if (options.value.direction === 'ascending') {
     options.value.direction = 'descending'
   } else {
     options.value.direction = 'ascending'
-  }
-}
-
-function resetOptions() {
-  console.log('resetting')
-  options.value = {
-    direction: null,
   }
 }
 
@@ -114,12 +125,25 @@ fetchData(true)
   </div>
   <div class="sorter">
     <p>Sort by</p>
-    <button @click="toggleDirection">
-      <span v-if="options.direction === 'ascending'"> 🌡️ Temp ↑ </span>
-      <span v-else-if="options.direction === 'descending'"> 🌡️ Temp ↓ </span>
+    <button @click="toggleSort('temperature')">
+      <span v-if="options.direction === 'ascending' && options.sortBy == 'temperature'">
+        🌡️ Temp ↑
+      </span>
+      <span v-else-if="options.direction === 'descending' && options.sortBy == 'temperature'">
+        🌡️ Temp ↓
+      </span>
       <span v-else> 🌡️ Temp </span>
     </button>
-    <button @click="resetOptions">Reset</button>
+    <button @click="toggleSort('alphabetical')">
+      <span v-if="options.direction === 'ascending' && options.sortBy == 'alphabetical'">
+        Abc ↑
+      </span>
+      <span v-else-if="options.direction === 'descending' && options.sortBy == 'alphabetical'">
+        Zxy ↓
+      </span>
+      <span v-else> Alphabetical </span>
+    </button>
+    <button @click="toggleSort(null)">Reset</button>
   </div>
   <div class="weather-cards" v-if="locationData.length > 0">
     <Card
