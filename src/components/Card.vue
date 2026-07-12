@@ -1,5 +1,7 @@
 <script setup>
-defineProps({
+import Time from '@/components/Time.vue'
+
+const { index, location } = defineProps({
   location: Object,
   index: Number,
 })
@@ -12,7 +14,9 @@ defineProps({
     <img :src="location.current.condition.icon" />
     <p>{{ location.current.condition.text }}</p>
     <p>Temperature: {{ location.current.temp_c }}</p>
-    <p>Local time: {{ location.location.localtime }}</p>
+    <p>Humidity: {{ location.current.humidity }}</p>
+    <p>Local time: <Time :epoch="location.location.localtime_epoch" /></p>
+    <p>Last updated: <Time :epoch="location.current.last_updated_epoch" /></p>
     <button class="delete-button" @click="$emit('deleteCard', index)">X</button>
   </div>
 </template>
