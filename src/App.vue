@@ -1,9 +1,8 @@
 <script setup>
-const API_KEY = '877e1c5722a14576bd2112544261007'
-
 import Card from '@/components/Card.vue'
 import Message from '@/components/Message.vue'
 import { ref, computed } from 'vue'
+import { useWeather } from '@/composables/Weather.vue'
 
 const locationData = ref([])
 const searchLocation = ref('')
@@ -14,48 +13,23 @@ const options = ref({
   direction: 'ascending',
 })
 
+const { fetchWeather, data, error } = useWeather()
+
+async function fetchData() {
+  await fetchWeather(searchLocation.value)
+
+  if (error.value) {
+    errorMsg.value = error.value.message
+  } else {
+    locationData.value.push(data.value)
+    setLocalStorage()
+  }
+  searchLocation.value = ''
+}
+
 if (localStorage.getItem('weatherData')) {
   locationData.value = JSON.parse(localStorage.getItem('weatherData'))
   console.log(JSON.parse(localStorage.getItem('weatherData')))
-}
-
-async function fetchData(autocall) {
-  isFetching.value = true
-
-  const locationExists = locationData.value.find(
-    (item) => item.location.name === searchLocation.value,
-  )
-
-  if (locationExists) {
-    isFetching.value = false
-    return
-  }
-
-  if (searchLocation.value.length <= 0) {
-    isFetching.value = false
-    return
-  }
-
-  const response = await fetch(
-    `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${searchLocation.value}`,
-  )
-  const result = await response.json()
-  isFetching.value = false
-
-  console.log('fetching')
-
-  if (result.error) {
-    // dont show
-    if (!autocall) {
-      errorMsg.value = result.error.message
-    }
-
-    return
-  }
-
-  locationData.value.push(result)
-  setLocalStorage()
-  searchLocation.value = ''
 }
 
 function setLocalStorage() {
@@ -74,6 +48,7 @@ function removeLocation(locationId) {
 
 const displayedLocations = computed(() => {
   let locations = [...locationData.value]
+  console.log(locations)
 
   if (options.value.sortBy === 'temperature') {
     if (options.value.direction === 'ascending') {
@@ -109,8 +84,6 @@ function toggleSort(sortBy) {
     options.value.direction = 'ascending'
   }
 }
-
-fetchData(true)
 </script>
 
 <template>
