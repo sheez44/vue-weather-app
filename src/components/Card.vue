@@ -21,10 +21,4 @@ const { index, location } = defineProps({
   </div>
 </template>
 
-<style scoped>
-.delete-button {
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-}
-</style>
+<style scoped></style>
