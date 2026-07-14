@@ -15,7 +15,7 @@ const { index, location } = defineProps({
     <p>{{ location.current.condition.text }}</p>
     <p>Temperature: {{ location.current.temp_c }}</p>
     <p>Humidity: {{ location.current.humidity }}</p>
-    <p>Local time: <Time :epoch="location.location.localtime_epoch" /></p>
+    <p>Local time: <Time :timeString="location.location.localtime" /></p>
     <p>Last updated: <Time :epoch="location.current.last_updated_epoch" /></p>
     <button class="absolute right-4 top-4" @click="$emit('deleteCard', index)">X</button>
   </div>

@@ -3,6 +3,7 @@ import Card from '@/components/Card.vue'
 import Message from '@/components/Message.vue'
 import { ref, computed } from 'vue'
 import { useWeather } from '@/composables/Weather.vue'
+import SearchResults from './components/SearchResults.vue'
 
 const locationData = ref([])
 const autosearchResults = ref([])
@@ -15,12 +16,12 @@ const options = ref({
   direction: 'ascending',
 })
 
-const { fetchWeather, data, error } = useWeather()
+const { getCurrent, getSearch, getForecast, data, error } = useWeather()
 
-async function fetchData(search) {
+async function fetchCurrentWeather(search) {
   const query = search ? search : searchLocation.value
 
-  await fetchWeather(query)
+  await getCurrent(query)
 
   if (error.value) {
     errorMsg.value = error.value.message
@@ -94,7 +95,7 @@ async function fetchSearch() {
     isAutosearch.value = false
     return
   }
-  await fetchWeather(searchLocation.value, ' /search.json')
+  await getSearch(searchLocation.value)
 
   if (error.value) {
     errorMsg.value = error.value.message
@@ -109,8 +110,8 @@ async function fetchSearch() {
 <template>
   <main class="container">
     <div class="relative">
-      <input v-model="searchLocation" @keyup.enter="fetchData()" @keyup="fetchSearch" />
-      <button @click="fetchData">enter location</button>
+      <input v-model="searchLocation" @keyup.enter="fetchCurrentWeather()" @keyup="fetchSearch" />
+      <button @click="fetchCurrentWeather">enter location</button>
       <button @click="clearAllData">Remove all cities</button>
       <div v-if="isFetching">
         <Message message="Is fetching data" />
@@ -118,19 +119,11 @@ async function fetchSearch() {
       <div v-if="errorMsg.length">
         <Message :message="errorMsg" />
       </div>
-      <div
-        class="searchresults bg-white z-10 shadow-lg py-2 w-3/4 absolute flex flex-col gap-1"
-        v-show="isAutosearch"
-      >
-        <div
-          class="result px-4 py-1 hover:bg-blue-200 cursor-pointer"
-          @click="fetchData(result.name)"
-          v-for="(result, index) in autosearchResults"
-          :key="index"
-        >
-          <p class="m-0">{{ result.name }}</p>
-        </div>
-      </div>
+      <SearchResults
+        :autosearchResults="autosearchResults"
+        v-on:fetchCurrentWeather="fetchCurrentWeather"
+        :isAutosearch="isAutosearch"
+      />
     </div>
     <div class="sorter">
       <p>Sort by</p>
