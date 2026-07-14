@@ -48,7 +48,6 @@ function removeLocation(locationId) {
 
 const displayedLocations = computed(() => {
   let locations = [...locationData.value]
-  console.log(locations)
 
   if (options.value.sortBy === 'temperature') {
     if (options.value.direction === 'ascending') {
@@ -87,54 +86,51 @@ function toggleSort(sortBy) {
 </script>
 
 <template>
-  <input v-model="searchLocation" @keyup.enter="fetchData" />
-  <button @click="fetchData">enter location</button>
-  <button @click="clearAllData">Remove all cities</button>
-  <div v-if="isFetching">
-    <Message message="Is fetching data" />
-  </div>
-  <div v-if="errorMsg.length">
-    <Message :message="errorMsg" />
-  </div>
-  <div class="sorter">
-    <p>Sort by</p>
-    <button @click="toggleSort('temperature')">
-      <span v-if="options.direction === 'ascending' && options.sortBy == 'temperature'">
-        🌡️ Temp ↑
-      </span>
-      <span v-else-if="options.direction === 'descending' && options.sortBy == 'temperature'">
-        🌡️ Temp ↓
-      </span>
-      <span v-else> 🌡️ Temp </span>
-    </button>
-    <button @click="toggleSort('alphabetical')">
-      <span v-if="options.direction === 'ascending' && options.sortBy == 'alphabetical'">
-        Abc ↑
-      </span>
-      <span v-else-if="options.direction === 'descending' && options.sortBy == 'alphabetical'">
-        Zxy ↓
-      </span>
-      <span v-else> Alphabetical </span>
-    </button>
-    <button @click="toggleSort(null)">Reset</button>
-  </div>
-  <div class="weather-cards" v-if="locationData.length > 0">
-    <Card
-      class="weather-card"
-      v-for="(location, index) in displayedLocations"
-      :key="index"
-      :index="index"
-      :location="location"
-      v-on:deleteCard="removeLocation"
-    />
-  </div>
+  <main class="container">
+    <input v-model="searchLocation" @keyup.enter="fetchData" />
+    <button @click="fetchData">enter location</button>
+    <button @click="clearAllData">Remove all cities</button>
+    <div v-if="isFetching">
+      <Message message="Is fetching data" />
+    </div>
+    <div v-if="errorMsg.length">
+      <Message :message="errorMsg" />
+    </div>
+    <div class="sorter">
+      <p>Sort by</p>
+      <button class="h-10" @click="toggleSort('temperature')">
+        <span v-if="options.direction === 'ascending' && options.sortBy == 'temperature'">
+          🌡️ Temp ↑
+        </span>
+        <span v-else-if="options.direction === 'descending' && options.sortBy == 'temperature'">
+          🌡️ Temp ↓
+        </span>
+        <span v-else> 🌡️ Temp </span>
+      </button>
+      <button class="h-10" @click="toggleSort('alphabetical')">
+        <span v-if="options.direction === 'ascending' && options.sortBy == 'alphabetical'">
+          Abc ↑
+        </span>
+        <span v-else-if="options.direction === 'descending' && options.sortBy == 'alphabetical'">
+          Zxy ↓
+        </span>
+        <span v-else> Alphabetical </span>
+      </button>
+      <button class="h-10" @click="toggleSort(null)">Reset</button>
+    </div>
+    <div
+      class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 my-4"
+      v-if="locationData.length > 0"
+    >
+      <Card
+        v-for="(location, index) in displayedLocations"
+        :key="index"
+        :index="index"
+        :location="location"
+        v-on:deleteCard="removeLocation"
+      />
+    </div>
+  </main>
 </template>
 
-<style scoped>
-.weather-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  margin: 1rem 0;
-}
-</style>
+<style scoped></style>
