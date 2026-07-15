@@ -1,9 +1,10 @@
 <script setup>
 import Card from '@/components/Card.vue'
 import Message from '@/components/Message.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, useTemplateRef } from 'vue'
 import { useWeather } from '@/composables/Weather.vue'
 import SearchResults from './components/SearchResults.vue'
+import { onClickOutside } from '@vueuse/core'
 
 const locationData = ref([])
 const autosearchResults = ref([])
@@ -20,6 +21,15 @@ const { getCurrent, getSearch, getForecast, data, error } = useWeather()
 
 async function fetchCurrentWeather(search) {
   const query = search ? search : searchLocation.value
+  console.log(locationData)
+  const location = locationData.value.find(
+    (loc) => loc.location.name.toLowerCase() === query.toLowerCase(),
+  )
+  console.log(location)
+  if (location) {
+    searchLocation.value = ''
+    return
+  }
 
   await getCurrent(query)
 
@@ -35,7 +45,6 @@ async function fetchCurrentWeather(search) {
 
 if (localStorage.getItem('weatherData')) {
   locationData.value = JSON.parse(localStorage.getItem('weatherData'))
-  console.log(JSON.parse(localStorage.getItem('weatherData')))
 }
 
 function setLocalStorage() {
@@ -105,6 +114,12 @@ async function fetchSearch() {
     console.log(data.value)
   }
 }
+
+const target = useTemplateRef('autosearch')
+
+onClickOutside(target, () => {
+  isAutosearch.value = false
+})
 </script>
 
 <template>
@@ -123,6 +138,7 @@ async function fetchSearch() {
         :autosearchResults="autosearchResults"
         v-on:fetchCurrentWeather="fetchCurrentWeather"
         :isAutosearch="isAutosearch"
+        ref="autosearch"
       />
     </div>
     <div class="sorter">

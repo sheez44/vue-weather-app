@@ -38,7 +38,7 @@ export function useWeather() {
   async function getForecast(location) {
     isLoading.value = true
     error.value = null
-    const url = `http://api.weatherapi.com/v1/${type}?key=${API_KEY}&q=${location}`
+    const url = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${location}`
     const response = await fetch(url)
     const result = await response.json()
 
