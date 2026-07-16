@@ -17,15 +17,14 @@ const options = ref({
   direction: 'ascending',
 })
 
-const { getCurrent, getSearch, getForecast, data, error } = useWeather()
+const { getCurrent, getSearch, data, error } = useWeather()
 
 async function fetchCurrentWeather(search) {
   const query = search ? search : searchLocation.value
-  console.log(locationData)
   const location = locationData.value.find(
     (loc) => loc.location.name.toLowerCase() === query.toLowerCase(),
   )
-  console.log(location)
+
   if (location) {
     searchLocation.value = ''
     return
@@ -111,7 +110,6 @@ async function fetchSearch() {
   } else {
     isAutosearch.value = true
     autosearchResults.value = data.value
-    console.log(data.value)
   }
 }
 
